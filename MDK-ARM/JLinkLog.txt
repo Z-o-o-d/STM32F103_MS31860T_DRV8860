@@ -1,0 +1,112 @@
+T9DD0 005:943.379   SEGGER J-Link V7.60g Log File
+T9DD0 005:943.466   DLL Compiled: Feb  2 2022 10:29:08
+T9DD0 005:943.483   Logging started @ 2026-04-24 10:36
+T9DD0 005:943.497 - 42.583ms
+T9DD0 005:943.512 JLINK_SetWarnOutHandler(...)
+T9DD0 005:943.526 - 0.021ms
+T9DD0 005:943.541 JLINK_OpenEx(...)
+T9DD0 005:944.936   Firmware: J-Link V9 compiled May  7 2021 16:26:12
+T9DD0 005:945.411   Firmware: J-Link V9 compiled May  7 2021 16:26:12
+T9DD0 005:945.539   Decompressing FW timestamp took 96 us
+T9DD0 005:952.937   Hardware: V9.20
+T9DD0 005:952.976   S/N: 59800888
+T9DD0 005:953.001   OEM: SEGGER
+T9DD0 005:953.026   Feature(s): RDI, GDB, FlashDL, FlashBP, JFlash
+T9DD0 005:955.152   TELNET listener socket opened on port 19021
+T9DD0 005:959.017   WEBSRV WEBSRV_Init(): Starting webserver thread(s)
+T9DD0 005:959.213   WEBSRV Webserver running on local port 19080
+T9DD0 006:016.579 - 73.067ms returns "O.K."
+T9DD0 006:016.629 JLINK_GetEmuCaps()
+T9DD0 006:016.648 - 0.026ms returns 0xB9FF7BBF
+T9DD0 006:016.668 JLINK_TIF_GetAvailable(...)
+T9DD0 006:017.048 - 0.393ms
+T9DD0 006:017.073 JLINK_SetErrorOutHandler(...)
+T9DD0 006:017.087 - 0.020ms
+T9DD0 006:017.108 JLINK_ExecCommand("ProjectFile = "C:\Users\he\Documents\EVT\TestF103RE\MDK-ARM\JLinkSettings.ini"", ...). 
+T9DD0 006:018.809 - 1.712ms returns 0x00
+T9DD0 006:018.838 JLINK_ExecCommand("Device = GD32F103RE", ...). 
+T9DD0 006:018.989   Device "GD32F103RE" selected.
+T9DD0 006:019.497 - 0.658ms returns 0x00
+T9DD0 006:019.527 JLINK_ExecCommand("DisableConnectionTimeout", ...). 
+T9DD0 006:019.550 - 0.010ms returns 0x01
+T9DD0 006:019.571 JLINK_GetHardwareVersion()
+T9DD0 006:019.587 - 0.025ms returns 92000
+T9DD0 006:019.610 JLINK_GetDLLVersion()
+T9DD0 006:019.628 - 0.027ms returns 76007
+T9DD0 006:019.650 JLINK_GetOEMString(...)
+T9DD0 006:019.676 JLINK_GetFirmwareString(...)
+T9DD0 006:019.689 - 0.020ms
+T9DD0 006:019.708 JLINK_GetDLLVersion()
+T9DD0 006:019.721 - 0.019ms returns 76007
+T9DD0 006:019.736 JLINK_GetCompileDateTime()
+T9DD0 006:019.749 - 0.019ms
+T9DD0 006:019.765 JLINK_GetFirmwareString(...)
+T9DD0 006:019.778 - 0.019ms
+T9DD0 006:019.793 JLINK_GetHardwareVersion()
+T9DD0 006:019.806 - 0.019ms returns 92000
+T9DD0 006:019.822 JLINK_GetSN()
+T9DD0 006:019.835 - 0.019ms returns 59800888
+T9DD0 006:019.851 JLINK_GetOEMString(...)
+T9DD0 006:020.316 JLINK_TIF_Select(JLINKARM_TIF_JTAG)
+T9DD0 006:022.147 - 1.865ms returns 0x00
+T9DD0 006:022.196 JLINK_HasError()
+T9DD0 006:022.217 JLINK_SetSpeed(10)
+T9DD0 006:022.534 - 0.332ms
+T9DD0 006:023.139 JLINK_HasError()
+T9DD0 006:023.163 JLINK_SetResetType(JLINKARM_RESET_TYPE_NORMAL)
+T9DD0 006:023.177 - 0.020ms returns JLINKARM_RESET_TYPE_NORMAL
+T9DD0 006:023.191 JLINK_Reset()
+T9DD0 006:100.690   TotalIRLen = 5, IRPrint = 0x01
+T9DD0 006:111.081   JTAG chain detection found 1 devices:
+T9DD0 006:111.130    #0 Id: 0x1000563D, IRLen: 05, RV32
+T9DD0 006:111.162   
+  ***** Error: 
+T9DD0 006:111.183   CPU-TAP not found in JTAG chain
+T9DD0 006:311.761   RESET (pin 15) high, but should be low. Please check target hardware.
+T9DD0 006:450.082   TotalIRLen = 5, IRPrint = 0x01
+T9DD0 006:460.652   JTAG chain detection found 1 devices:
+T9DD0 006:460.712    #0 Id: 0x1000563D, IRLen: 05, RV32
+T9DD0 006:460.746   
+  ***** Error: 
+T9DD0 006:460.778   CPU-TAP not found in JTAG chain
+T9DD0 006:460.810 - 437.629ms
+T9DD0 006:460.846 JLINK_GetIdData(pIdData)
+T9DD0 006:538.428   TotalIRLen = 5, IRPrint = 0x01
+T9DD0 006:548.828   JTAG chain detection found 1 devices:
+T9DD0 006:548.867    #0 Id: 0x1000563D, IRLen: 05, RV32
+T9DD0 006:548.894   
+  ***** Error: 
+T9DD0 006:548.920   CPU-TAP not found in JTAG chain
+T9DD0 006:749.977   RESET (pin 15) high, but should be low. Please check target hardware.
+T9DD0 006:888.779   TotalIRLen = 5, IRPrint = 0x01
+T9DD0 006:899.252   JTAG chain detection found 1 devices:
+T9DD0 006:899.303    #0 Id: 0x1000563D, IRLen: 05, RV32
+T9DD0 006:899.327   
+  ***** Error: 
+T9DD0 006:899.349   CPU-TAP not found in JTAG chain
+T9DD0 006:899.371 - 438.532ms
+T9DD0 006:899.397 JLINK_GetIdData(pIdData)
+T9DD0 006:977.002   TotalIRLen = 5, IRPrint = 0x01
+T9DD0 006:987.478   JTAG chain detection found 1 devices:
+T9DD0 006:987.518    #0 Id: 0x1000563D, IRLen: 05, RV32
+T9DD0 006:987.542   
+  ***** Error: 
+T9DD0 006:987.564   CPU-TAP not found in JTAG chain
+T9DD0 007:189.031   RESET (pin 15) high, but should be low. Please check target hardware.
+T9DD0 007:328.121   TotalIRLen = 5, IRPrint = 0x01
+T9DD0 007:338.585   JTAG chain detection found 1 devices:
+T9DD0 007:338.641    #0 Id: 0x1000563D, IRLen: 05, RV32
+T9DD0 007:338.671   
+  ***** Error: 
+T9DD0 007:338.698   CPU-TAP not found in JTAG chain
+T9DD0 007:338.726 - 439.338ms
+T9DD0 007:341.422 JLINK_GetFirmwareString(...)
+T9DD0 007:341.451 - 0.037ms
+TC208 015:298.792 Looking for J-Link GUI Server exe at: C:\Users\he\AppData\Local\Keil_v5\ARM\Segger\JLinkGUIServer.exe
+TC208 015:299.185 Looking for J-Link GUI Server exe at: C:\Program Files\SEGGER\JLink\JLinkGUIServer.exe
+TC208 015:299.315 Forking J-Link GUI Server: C:\Program Files\SEGGER\JLink\JLinkGUIServer.exe
+TC208 015:580.348 J-Link GUI Server info: "J-Link GUI server V7.60g "
+T9DD0 019:263.469 JLINK_Close()
+T9DD0 019:313.596 - 50.164ms
+T9DD0 019:313.641   
+T9DD0 019:313.655   Closed
