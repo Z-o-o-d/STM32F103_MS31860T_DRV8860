@@ -33,6 +33,11 @@
 /* USER CODE BEGIN PD */
 
 #define SOFT_SPI_DELAY_CYCLES 30U
+#define MS31860T_CHIPS 4U
+#define MS31860T_CHANNELS_PER_CHIP 8U
+#define MS31860T_TOTAL_CHANNELS (MS31860T_CHIPS * MS31860T_CHANNELS_PER_CHIP)
+#define MS31860T_CH_ON_PATTERN 0x0002U
+#define MS31860T_FAULT_ACTIVE_LEVEL GPIO_PIN_RESET
 
 /* USER CODE END PD */
 
@@ -54,6 +59,10 @@ static void MX_GPIO_Init(void);
 static void SoftSPI_Init(void);
 static void SoftSPI_CS(uint8_t level);
 static uint8_t SoftSPI_TransferByte(uint8_t tx);
+static void MS31860T_SetEnable(uint8_t enable);
+static uint8_t MS31860T_IsFaultActive(void);
+static void MS31860T_TransferFrame(const uint16_t *tx_data, uint16_t *rx_data, uint8_t chips);
+static void MS31860T_SetSingleChannel(uint8_t ch, uint16_t *tx_data, uint8_t chips);
 
 /* USER CODE END PFP */
 
@@ -108,6 +117,58 @@ static uint8_t SoftSPI_TransferByte(uint8_t tx)
   return rx;
 }
 
+static void MS31860T_SetEnable(uint8_t enable)
+{
+  HAL_GPIO_WritePin(ENABLE_GPIO_Port, ENABLE_Pin, enable ? GPIO_PIN_RESET : GPIO_PIN_SET);
+}
+
+static uint8_t MS31860T_IsFaultActive(void)
+{
+  return (HAL_GPIO_ReadPin(FAULT_GPIO_Port, FAULT_Pin) == MS31860T_FAULT_ACTIVE_LEVEL) ? 1U : 0U;
+}
+
+static void MS31860T_TransferFrame(const uint16_t *tx_data, uint16_t *rx_data, uint8_t chips)
+{
+  uint8_t i;
+
+  SoftSPI_CS(0);
+  SoftSPI_Delay();
+
+  for (i = 0; i < chips; i++)
+  {
+    uint16_t rx_word = (uint16_t)SoftSPI_TransferByte((uint8_t)(tx_data[i] >> 8)) << 8;
+    rx_word |= SoftSPI_TransferByte((uint8_t)(tx_data[i] & 0xFFU));
+    if (rx_data != NULL)
+    {
+      rx_data[i] = rx_word;
+    }
+  }
+
+  SoftSPI_Delay();
+  SoftSPI_CS(1);
+}
+
+static void MS31860T_SetSingleChannel(uint8_t ch, uint16_t *tx_data, uint8_t chips)
+{
+  uint8_t i;
+  uint8_t target_chip;
+  uint8_t target_channel;
+
+  for (i = 0; i < chips; i++)
+  {
+    tx_data[i] = 0U;
+  }
+
+  target_chip = (uint8_t)(ch / MS31860T_CHANNELS_PER_CHIP);
+  target_channel = (uint8_t)(ch % MS31860T_CHANNELS_PER_CHIP);
+
+  if (target_chip < chips)
+  {
+    /* Daisy-chain order: tx_data[chips-1] reaches first chip, tx_data[0] reaches last chip. */
+    tx_data[(chips - 1U) - target_chip] = (uint16_t)(MS31860T_CH_ON_PATTERN << (target_channel * 2U));
+  }
+}
+
 /* USER CODE END 0 */
 
 /**
@@ -141,6 +202,10 @@ int main(void)
   MX_GPIO_Init();
   /* USER CODE BEGIN 2 */
   SoftSPI_Init();
+  MS31860T_SetEnable(0U);
+  HAL_Delay(10);
+  MS31860T_SetEnable(1U);
+  HAL_Delay(2);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -148,40 +213,24 @@ int main(void)
   uint8_t ch = 0;
   while (1)
   {
-    uint16_t tx_data[4] = {0, 0, 0, 0};
-    uint16_t rx_data[4];
-    uint8_t i;
+    uint16_t tx_data[MS31860T_CHIPS];
+    uint16_t rx_data[MS31860T_CHIPS];
+    uint8_t fault_active;
 
-    /* BD8LA700EFV: 8 channels per chip, 0xAAAA means all channels ON (10 in binary per channel).
-     * To turn ON a single channel: shift 0x0002 (binary 10) by (channel * 2).
-     * We have 4 chips = 32 channels in total.
-     */
-    uint8_t target_chip = ch / 8;        /* 0 to 3 */
-    uint8_t target_channel = ch % 8;     /* 0 to 7 */
+    MS31860T_SetSingleChannel(ch, tx_data, MS31860T_CHIPS);
+    MS31860T_TransferFrame(tx_data, rx_data, MS31860T_CHIPS);
 
-    /* tx_data[3] lands in Chip 1 (first), tx_data[0] lands in Chip 4 (last) */
-    tx_data[3 - target_chip] = (0x0002U << (target_channel * 2));
-
-    SoftSPI_CS(0);
-    SoftSPI_Delay(); /* CS lead time */
-    
-    for (i = 0; i < 4; i++)
-    {
-      rx_data[i] = (uint16_t)SoftSPI_TransferByte((uint8_t)(tx_data[i] >> 8)) << 8;
-      rx_data[i] |= SoftSPI_TransferByte((uint8_t)(tx_data[i] & 0xFF));
-    }
-    
-    SoftSPI_Delay(); /* CS lag time */
-    SoftSPI_CS(1);
+    fault_active = MS31860T_IsFaultActive();
+    HAL_GPIO_WritePin(LED_ERR_GPIO_Port, LED_ERR_Pin, fault_active ? GPIO_PIN_SET : GPIO_PIN_RESET);
+    HAL_GPIO_TogglePin(LED_RUN_GPIO_Port, LED_RUN_Pin);
 
     ch++;
-    if (ch >= 32)
+    if (ch >= MS31860T_TOTAL_CHANNELS)
     {
       ch = 0;
     }
-		HAL_GPIO_TogglePin(GPIOC, LED_RUN_Pin|LED_ERR_Pin);
 
-    HAL_Delay(500); /* 100ms delay for running light effect */
+    HAL_Delay(500);
 
     /* USER CODE END WHILE */
 
@@ -248,7 +297,7 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOC_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOA, CSN_Pin|SCLK_Pin|MISO_Pin|MOSI_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOA, CSN_Pin|SCLK_Pin|MOSI_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(ENABLE_GPIO_Port, ENABLE_Pin, GPIO_PIN_RESET);
@@ -256,12 +305,18 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOC, LED_RUN_Pin|LED_ERR_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pins : CSN_Pin SCLK_Pin MISO_Pin MOSI_Pin */
-  GPIO_InitStruct.Pin = CSN_Pin|SCLK_Pin|MISO_Pin|MOSI_Pin;
+  /*Configure GPIO pins : CSN_Pin SCLK_Pin MOSI_Pin */
+  GPIO_InitStruct.Pin = CSN_Pin|SCLK_Pin|MOSI_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : MISO_Pin */
+  GPIO_InitStruct.Pin = MISO_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(MISO_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : FAULT_Pin */
   GPIO_InitStruct.Pin = FAULT_Pin;
